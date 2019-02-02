@@ -432,7 +432,13 @@ prompt_git() {
 
     eval git_prompt=${BULLETTRAIN_GIT_PROMPT_CMD}
     if [[ $BULLETTRAIN_GIT_EXTENDED == true ]]; then
-      echo -n ${git_prompt}$(git_prompt_status)
+
+      if [ $(git status --short | wc -l) -gt 0 ]; then 
+	echo -n ${git_prompt}$(git_prompt_status) $(git status --short --ignore-submodules | wc -l | awk '{$1=$1};1')
+      else       
+        echo -n ${git_prompt}$(git_prompt_status)
+      fi
+
     else
       echo -n ${git_prompt}
     fi
@@ -575,14 +581,23 @@ prompt_virtualenv() {
 # NVM: Node version manager
 prompt_nvm() {
   local nvm_prompt
-  if type nvm >/dev/null 2>&1; then
-    nvm_prompt=$(nvm current 2>/dev/null)
-    [[ "${nvm_prompt}x" == "x" ]] && return
-  elif type node >/dev/null 2>&1; then
-    nvm_prompt="$(node --version)"
+  
+  if ls | grep package.json -q; then
+    if type nvm >/dev/null 2>&1; then
+      nvm_prompt=$(nvm current 2>/dev/null)
+      [[ "${nvm_prompt}x" == "x" ]] && return
+    elif type node >/dev/null 2>&1; then
+      nvm_prompt="$(node --version)"
+      if type npm >/dev/null 2>&1; then
+        nvm_prompt+=" / npm v$(npm -v)"
+      fi
+    else
+      return
+    fi
   else
     return
   fi
+
   nvm_prompt=${nvm_prompt}
   prompt_segment $BULLETTRAIN_NVM_BG $BULLETTRAIN_NVM_FG $BULLETTRAIN_NVM_PREFIX$nvm_prompt
 }
