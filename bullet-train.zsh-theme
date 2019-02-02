@@ -371,6 +371,13 @@ context() {
 
 prompt_context() {
   local _context="$(context)"
+
+  # Sudo: https://superuser.com/questions/195781/sudo-is-there-a-command-to-check-if-i-have-sudo-and-or-how-much-time-is-left
+  CAN_I_RUN_SUDO=$(sudo -n uptime 2>&1|grep "load"|wc -l)
+  if [ ${CAN_I_RUN_SUDO} -gt 0 ]; then
+    _context+=" 🔑"
+  fi
+
   [[ -n "$_context" ]] && prompt_segment $BULLETTRAIN_CONTEXT_BG $BULLETTRAIN_CONTEXT_FG "$_context"
 }
 
