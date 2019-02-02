@@ -433,10 +433,12 @@ prompt_git() {
     eval git_prompt=${BULLETTRAIN_GIT_PROMPT_CMD}
     if [[ $BULLETTRAIN_GIT_EXTENDED == true ]]; then
 
+      
+
       if [ $(git status --short | wc -l) -gt 0 ]; then 
-	echo -n ${git_prompt}$(git_prompt_status) $(git status --short --ignore-submodules | wc -l | awk '{$1=$1};1')
+	echo -n $(git config user.name) ${git_prompt}$(git_prompt_status) $(git status --short --ignore-submodules | wc -l | awk '{$1=$1};1')
       else       
-        echo -n ${git_prompt}$(git_prompt_status)
+        echo -n $(git config user.name) ${git_prompt}$(git_prompt_status)
       fi
 
     else
